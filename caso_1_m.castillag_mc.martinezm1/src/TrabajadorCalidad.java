@@ -64,7 +64,6 @@ public class TrabajadorCalidad extends Thread {
                 buzonReproceso.agregarElemento("FIN");
                 buzonReproceso.notifyAll();
             }
-            return;
         }
     }
 
