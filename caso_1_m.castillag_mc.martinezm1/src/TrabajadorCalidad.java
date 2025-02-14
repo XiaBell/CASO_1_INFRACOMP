@@ -4,23 +4,19 @@ public class TrabajadorCalidad extends Thread {
     private final BuzonRevision buzonRevision;
     private final BuzonReproceso buzonReproceso;
     private final BuzonDeposito buzonDeposito;
-    private final Random random;
     private int productosProcesados;
     private int productosRechazados;
-    private static final double MAX_FALLAS_PORCENTAJE = 0.10; // Máximo de 10% de fallas respecto a la cantidad de productos procesados
     private final int max_productos;
 
     public TrabajadorCalidad(BuzonRevision buzonRevision, BuzonReproceso buzonReproceso, BuzonDeposito buzonDeposito, int MAX_PRODUCTOS) {
         this.buzonRevision = buzonRevision;
         this.buzonReproceso = buzonReproceso;
         this.buzonDeposito = buzonDeposito;
-        this.random = new Random();
         this.productosProcesados = 0;
         this.productosRechazados = 0;
         this.max_productos = MAX_PRODUCTOS;
     }
 
-    @Override
     public void run() {
         while (true) {
             synchronized (buzonRevision) {
@@ -49,7 +45,7 @@ public class TrabajadorCalidad extends Thread {
 
     private void procesarProducto(String producto) {
         productosProcesados++;
-        if (productosRechazados >= productosProcesados * MAX_FALLAS_PORCENTAJE) {
+        if (productosRechazados >= productosProcesados * 0.10) {
             aceptarProducto(producto);
         } else {
             if (debeRechazarProducto()) {
@@ -68,7 +64,7 @@ public class TrabajadorCalidad extends Thread {
     }
 
     private boolean debeRechazarProducto() {
-        int numeroAleatorio = random.nextInt(100) + 1;
+        int numeroAleatorio = (int) (Math.random() * 100) + 1;
         return numeroAleatorio % 7 == 0;
     }
 
