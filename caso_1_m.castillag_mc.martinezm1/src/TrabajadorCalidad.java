@@ -59,7 +59,7 @@ public class TrabajadorCalidad extends Thread {
                 aceptarProducto(producto);
             }
         }
-        if (productosProcesados >= MAX_PRODUCTOS) {
+        if (productosProcesados >= max_productos) {
             synchronized (buzonReproceso) {
                 buzonReproceso.agregarElemento("FIN");
                 buzonReproceso.notifyAll();
