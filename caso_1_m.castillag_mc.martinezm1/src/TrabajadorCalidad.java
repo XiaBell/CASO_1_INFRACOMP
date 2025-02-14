@@ -8,13 +8,14 @@ public class TrabajadorCalidad extends Thread {
     private int productosRechazados;
     private final int max_productos;
 
-    public TrabajadorCalidad(BuzonRevision buzonRevision, BuzonReproceso buzonReproceso, BuzonDeposito buzonDeposito, int MAX_PRODUCTOS) {
+    public TrabajadorCalidad(BuzonRevision buzonRevision, BuzonReproceso buzonReproceso, BuzonDeposito buzonDeposito) {
+        Random random = new Random();
+        max_productos = (int) (random.nextInt(100) * 0.1);
         this.buzonRevision = buzonRevision;
         this.buzonReproceso = buzonReproceso;
         this.buzonDeposito = buzonDeposito;
         this.productosProcesados = 0;
         this.productosRechazados = 0;
-        this.max_productos = MAX_PRODUCTOS;
     }
 
     @Override

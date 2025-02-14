@@ -1,11 +1,11 @@
 public class TrabajadorProductor extends Thread {
-    private final BuzonRevision buzonRevision;
-    private final BuzonReproceso buzonReproceso;
+    private static BuzonRevision buzonRevision;
+    private static BuzonReproceso buzonReproceso;
     private final String producto;
 
     public TrabajadorProductor(BuzonRevision buzonRevision, BuzonReproceso buzonReproceso, String producto) {
-        this.buzonRevision = buzonRevision;
-        this.buzonReproceso = buzonReproceso;
+        TrabajadorProductor.buzonRevision = buzonRevision;
+        TrabajadorProductor.buzonReproceso = buzonReproceso;
         this.producto = producto;
     }
 
