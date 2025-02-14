@@ -1,3 +1,5 @@
+package com.example.calidad;
+
 import java.util.Random;
 
 public class TrabajadorCalidad extends Thread {
@@ -8,6 +10,7 @@ public class TrabajadorCalidad extends Thread {
     private int productosProcesados;
     private int productosRechazados;
     private static final double MAX_FALLAS_PORCENTAJE = 0.10; // Máximo de 10% de fallas respecto a la cantidad de productos procesados
+    private static final int MAX_PRODUCTOS = 100; // Define el máximo total de productos a producir
 
     public TrabajadorCalidad(BuzonRevision buzonRevision, BuzonReproceso buzonReproceso, BuzonDeposito buzonDeposito) {
         this.buzonRevision = buzonRevision;
@@ -47,7 +50,7 @@ public class TrabajadorCalidad extends Thread {
 
     private void procesarProducto(String producto) {
         productosProcesados++;
-        if (productosRechazados >= Math.floor(productosProcesados * MAX_FALLAS_PORCENTAJE)) {
+        if (productosRechazados >= productosProcesados * MAX_FALLAS_PORCENTAJE) {
             aceptarProducto(producto);
         } else {
             if (debeRechazarProducto()) {
@@ -57,11 +60,18 @@ public class TrabajadorCalidad extends Thread {
                 aceptarProducto(producto);
             }
         }
+        if (productosProcesados >= MAX_PRODUCTOS) {
+            synchronized (buzonReproceso) {
+                buzonReproceso.agregarElemento("FIN");
+                buzonReproceso.notifyAll();
+            }
+            return;
+        }
     }
 
     private boolean debeRechazarProducto() {
         int numeroAleatorio = random.nextInt(100) + 1;
-        return Math.floor(numeroAleatorio % 7) == 0;
+        return numeroAleatorio % 7 == 0;
     }
 
     private void rechazarProducto(String producto) {
@@ -77,4 +87,5 @@ public class TrabajadorCalidad extends Thread {
             buzonDeposito.notifyAll();
         }
     }
+}
 }
