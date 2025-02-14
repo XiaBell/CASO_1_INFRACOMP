@@ -8,15 +8,16 @@ public class TrabajadorCalidad extends Thread {
     private int productosProcesados;
     private int productosRechazados;
     private static final double MAX_FALLAS_PORCENTAJE = 0.10; // Máximo de 10% de fallas respecto a la cantidad de productos procesados
-    private static final int MAX_PRODUCTOS = 100; // Define el máximo total de productos a producir
+    private final int max_productos;
 
-    public TrabajadorCalidad(BuzonRevision buzonRevision, BuzonReproceso buzonReproceso, BuzonDeposito buzonDeposito) {
+    public TrabajadorCalidad(BuzonRevision buzonRevision, BuzonReproceso buzonReproceso, BuzonDeposito buzonDeposito, int MAX_PRODUCTOS) {
         this.buzonRevision = buzonRevision;
         this.buzonReproceso = buzonReproceso;
         this.buzonDeposito = buzonDeposito;
         this.random = new Random();
         this.productosProcesados = 0;
         this.productosRechazados = 0;
+        this.max_productos = MAX_PRODUCTOS;
     }
 
     @Override
