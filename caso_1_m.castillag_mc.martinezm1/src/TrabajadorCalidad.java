@@ -1,5 +1,3 @@
-package com.example.calidad;
-
 import java.util.Random;
 
 public class TrabajadorCalidad extends Thread {
