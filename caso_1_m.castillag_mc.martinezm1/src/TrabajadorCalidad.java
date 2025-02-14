@@ -87,4 +87,4 @@ public class TrabajadorCalidad extends Thread {
         }
     }
 }
-}
+
