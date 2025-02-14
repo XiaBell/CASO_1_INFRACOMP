@@ -17,6 +17,7 @@ public class TrabajadorCalidad extends Thread {
         this.max_productos = MAX_PRODUCTOS;
     }
 
+    @Override
     public void run() {
         while (true) {
             synchronized (buzonRevision) {
@@ -64,7 +65,8 @@ public class TrabajadorCalidad extends Thread {
     }
 
     private boolean debeRechazarProducto() {
-        int numeroAleatorio = (int) (Math.random() * 100) + 1;
+        Random random = new Random();
+        int numeroAleatorio = random.nextInt(100) + 1;
         return numeroAleatorio % 7 == 0;
     }
 
