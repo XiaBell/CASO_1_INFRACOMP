@@ -17,6 +17,7 @@ public class BuzonReproceso {
     }
 
     public synchronized boolean vacio() {
+        notifyAll();
         return elementosReproceso.isEmpty();
     }
 

@@ -18,7 +18,7 @@ public class TrabajadorCalidad extends Thread {
     @Override
     public void run() {
         while (true) {
-            if (productosProcesados >= maxProductos) {
+            if (Main.buzonDeposito.getCantidadElementos() >= maxProductos) {
                 synchronized (Main.buzonReproceso) {
                     Main.buzonReproceso.agregarElemento("FIN");
                     Main.buzonReproceso.notifyAll();

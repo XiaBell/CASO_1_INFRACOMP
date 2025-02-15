@@ -26,6 +26,7 @@ public class BuzonRevision {
     }
 
     public synchronized boolean lleno() {
+        notifyAll();
         return ElementosRevision.size() >= capacidad;
     }
 }

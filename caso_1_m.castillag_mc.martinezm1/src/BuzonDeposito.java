@@ -13,4 +13,8 @@ public class BuzonDeposito {
         return ElementosDeposito;
     }
 
+    public synchronized int getCantidadElementos() {
+        return ElementosDeposito.size();
+    }
+
 }
