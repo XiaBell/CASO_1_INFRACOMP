@@ -25,8 +25,16 @@ public class BuzonRevision {
         return "Elemento revisado"; 
     }
 
+    public synchronized String getElemento() {
+        return ElementosRevision.get(0);
+    }
+
     //Si lleno es true, no se puede producir un nuevo producto
     public synchronized boolean lleno() {
         return ElementosRevision.size() >= 0;
+    }
+
+    public synchronized boolean vacio() {
+        return ElementosRevision.size() <= 0;
     }
 }

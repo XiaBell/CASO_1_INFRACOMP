@@ -7,6 +7,8 @@ public class Main {
         int productosTotales = 0;
         int LímiteBuzónRevisión = 0;
 
+        //Ahcer conteo de productos toales procesados por el equipo de calidad y que pare al llegar al máximo de productos totales
+
         Scanner input = new Scanner(System.in);
 
         System.out.print("Ingrese la cantidad de operiarios de producción y de calidad: ");

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class BuzonDeposito {
     private ArrayList<String> ElementosDeposito = new ArrayList<String>();
 
-    public synchronized void AgregarElemento(String producto) {
+    public synchronized void agregarElemento(String producto) {
         ElementosDeposito.add(producto);
     }
 
