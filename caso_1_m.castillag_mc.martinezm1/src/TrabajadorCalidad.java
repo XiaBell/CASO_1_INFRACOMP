@@ -1,8 +1,6 @@
 import java.util.Random;
-import java.util.logging.Logger;
 
 public class TrabajadorCalidad extends Thread {
-    private static final Logger logger = Logger.getLogger(TrabajadorCalidad.class.getName());
     private int productosProcesados;
     private int productosRechazados;
     private final int maxProductos;
@@ -76,7 +74,7 @@ public class TrabajadorCalidad extends Thread {
             Main.buzonReproceso.agregarElemento(producto);
             Main.buzonReproceso.notifyAll();
         }
-        logger.info("Trabajador " + idTrabajador + " rechazó el producto: " + producto);
+        System.out.println("Trabajador " + idTrabajador + " rechazó el producto: " + producto);
     }
 
     private void aceptarProducto(String producto) {
@@ -84,7 +82,7 @@ public class TrabajadorCalidad extends Thread {
             Main.buzonDeposito.AgregarElemento(producto);
             Main.buzonDeposito.notifyAll();
         }
-        logger.info("Trabajador " + idTrabajador + " aceptó el producto: " + producto);
+        System.out.println("Trabajador " + idTrabajador + " aceptó el producto: " + producto);
     }
 
     private void procesarProductosRestantes() {

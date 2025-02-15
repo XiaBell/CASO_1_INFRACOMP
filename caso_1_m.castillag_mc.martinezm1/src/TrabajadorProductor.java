@@ -1,8 +1,6 @@
-import java.util.logging.Logger;
-
 public class TrabajadorProductor extends Thread {
 
-    private static final Logger logger = Logger.getLogger(TrabajadorProductor.class.getName());
+    private static final String TRABAJADOR = "Trabajador ";
     private final int id;
 
     public TrabajadorProductor(int id) {
@@ -17,11 +15,11 @@ public class TrabajadorProductor extends Thread {
                     if (!Main.buzonReproceso.vacio()) {
                         String productoReproceso = Main.buzonReproceso.obtenerElemento();
                         if ("FIN".equals(productoReproceso)) {
-                            logger.info("Trabajador " + id + " recibió 'FIN'. Terminando thread.");
+                            System.out.println(TRABAJADOR + id + " recibió 'FIN'. Terminando thread.");
                             break;
                         }
                         String productoId = "PRODUCTO" + (System.currentTimeMillis() % 100000);
-                        logger.info("Trabajador " + id + " reprocesa: " + productoId);
+                        System.out.println(TRABAJADOR + id + " reprocesa: " + productoId);
                         synchronized (Main.buzonRevision) {
                             while (Main.buzonRevision.lleno()) {
                                 Main.buzonRevision.wait();
@@ -31,7 +29,7 @@ public class TrabajadorProductor extends Thread {
                         }
                     } else {
                         String productoId = "PRODUCTO" + (System.currentTimeMillis() % 100000);
-                        logger.info("Trabajador " + id + " crea: " + productoId);
+                        System.out.println(TRABAJADOR + id + " crea: " + productoId);
                         synchronized (Main.buzonRevision) {
                             while (Main.buzonRevision.lleno()) {
                                 Main.buzonRevision.wait();
