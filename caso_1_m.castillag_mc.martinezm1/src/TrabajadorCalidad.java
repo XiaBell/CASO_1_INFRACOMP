@@ -1,30 +1,36 @@
 import java.util.Random;
 
 public class TrabajadorCalidad extends Thread {
-    private final BuzonRevision buzonRevision;
-    private final BuzonReproceso buzonReproceso;
-    private final BuzonDeposito buzonDeposito;
     private int productosProcesados;
     private int productosRechazados;
-    private final int max_productos;
+    private final int maxProductos;
+    private final int idTrabajador;
+    private final Random random;
 
-    public TrabajadorCalidad(BuzonRevision buzonRevision, BuzonReproceso buzonReproceso, BuzonDeposito buzonDeposito) {
-        Random random = new Random();
-        max_productos = (int) (random.nextInt(100) * 0.1);
-        this.buzonRevision = buzonRevision;
-        this.buzonReproceso = buzonReproceso;
-        this.buzonDeposito = buzonDeposito;
+    public TrabajadorCalidad(int maxProductos, int idTrabajador) {
         this.productosProcesados = 0;
         this.productosRechazados = 0;
+        this.maxProductos = maxProductos;
+        this.idTrabajador = idTrabajador;
+        this.random = new Random();
     }
 
     @Override
     public void run() {
         while (true) {
-            synchronized (buzonRevision) {
-                while (buzonRevision.lleno()) {
+            if (productosProcesados >= maxProductos) {
+                synchronized (Main.buzonReproceso) {
+                    Main.buzonReproceso.agregarElemento("FIN");
+                    Main.buzonReproceso.notifyAll();
+                }
+                procesarProductosRestantes();
+                return;
+            }
+
+            synchronized (Main.buzonRevision) {
+                while (Main.buzonRevision.lleno()) {
                     try {
-                        buzonRevision.wait();
+                        Main.buzonRevision.wait();
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         return;
@@ -32,7 +38,7 @@ public class TrabajadorCalidad extends Thread {
                 }
                 String producto = null;
                 try {
-                    producto = buzonRevision.retirarElemento();
+                    producto = Main.buzonRevision.retirarElemento();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return;
@@ -50,39 +56,51 @@ public class TrabajadorCalidad extends Thread {
         if (productosRechazados >= productosProcesados * 0.10) {
             aceptarProducto(producto);
         } else {
-            if (debeRechazarProducto()) {
+            if (aceptarORechazar()) {
                 productosRechazados++;
                 rechazarProducto(producto);
             } else {
                 aceptarProducto(producto);
             }
         }
-        if (productosProcesados >= max_productos) {
-            synchronized (buzonReproceso) {
-                buzonReproceso.agregarElemento("FIN");
-                buzonReproceso.notifyAll();
-            }
-        }
     }
 
-    private boolean debeRechazarProducto() {
-        Random random = new Random();
-        int numeroAleatorio = random.nextInt(100) + 1;
-        return numeroAleatorio % 7 == 0;
+    private boolean aceptarORechazar() {
+        return random.nextInt(100) + 1 % 7 == 0;
     }
 
     private void rechazarProducto(String producto) {
-        synchronized (buzonReproceso) {
-            buzonReproceso.agregarElemento(producto);
-            buzonReproceso.notifyAll();
+        synchronized (Main.buzonReproceso) {
+            Main.buzonReproceso.agregarElemento(producto);
+            Main.buzonReproceso.notifyAll();
         }
+        System.out.println("Trabajador " + idTrabajador + " rechazó el producto: " + producto);
     }
 
     private void aceptarProducto(String producto) {
-        synchronized (buzonDeposito) {
-            buzonDeposito.AgregarElemento(producto);
-            buzonDeposito.notifyAll();
+        synchronized (Main.buzonDeposito) {
+            Main.buzonDeposito.AgregarElemento(producto);
+            Main.buzonDeposito.notifyAll();
+        }
+        System.out.println("Trabajador " + idTrabajador + " aceptó el producto: " + producto);
+    }
+
+    private void procesarProductosRestantes() {
+        while (true) {
+            synchronized (Main.buzonRevision) {
+                if (!Main.buzonRevision.lleno()) {
+                    break;
+                }
+                String producto = null;
+                try {
+                    producto = Main.buzonRevision.retirarElemento();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                if (producto != null) {
+                    procesarProducto(producto);
+                }
+            }
         }
     }
 }
-
