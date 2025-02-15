@@ -22,7 +22,7 @@ public class TrabajadorCalidad extends Thread {
     public void run() {
         while (true) {
             synchronized (buzonRevision) {
-                while (buzonRevision.conElemento()) {
+                while (buzonRevision.lleno()) {
                     try {
                         buzonRevision.wait();
                     } catch (InterruptedException e) {

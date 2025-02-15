@@ -25,13 +25,8 @@ public class BuzonRevision {
         return "Elemento revisado"; 
     }
 
-    //Si conElemento es true, no se puede producir un nuevo producto
-    public synchronized boolean conElemento() {
-        return ElementosRevision.size() > 0;
-    }
-
-    //Si finProceso es true, se termina el proceso. Sucede cuando se recibe un "FIN" en el buzón de revisión 
-    public synchronized boolean finProceso() {
-        return "FIN".equals(ElementosRevision.get(0));
+    //Si lleno es true, no se puede producir un nuevo producto
+    public synchronized boolean lleno() {
+        return ElementosRevision.size() >= 0;
     }
 }

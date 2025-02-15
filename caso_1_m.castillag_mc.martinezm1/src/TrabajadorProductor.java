@@ -16,7 +16,7 @@ public class TrabajadorProductor extends Thread {
         try {
             while (true) {
                 synchronized (buzonRevision) {
-                    while (buzonRevision.conElemento()) {
+                    while (buzonRevision.lleno()) {
                         buzonRevision.wait();
                     }
                     buzonRevision.agregarElemento(producto);
