@@ -1,106 +1,103 @@
 import java.util.Random;
 
 public class TrabajadorCalidad extends Thread {
+
+    private static BuzonRevision buzonRevision;
+    private static BuzonReproceso buzonReproceso;
+    private static BuzonDeposito buzonDeposito;
+    private int id;
     private int productosProcesados;
     private int productosRechazados;
-    private final int maxProductos;
-    private final int idTrabajador;
-    private final Random random;
+    private int max_productos;
+    private static int productosTotalesProcesados = 0;
+    private static int productosTotales;
 
-    public TrabajadorCalidad(int maxProductos, int idTrabajador) {
+    public TrabajadorCalidad(BuzonRevision buzonRevision, BuzonReproceso buzonReproceso, BuzonDeposito buzonDeposito, int id, int productosTotales) {
+        TrabajadorCalidad.buzonRevision = buzonRevision;
+        TrabajadorCalidad.buzonReproceso = buzonReproceso;
+        TrabajadorCalidad.buzonDeposito = buzonDeposito;
+        this.id = id;
         this.productosProcesados = 0;
         this.productosRechazados = 0;
-        this.maxProductos = maxProductos;
-        this.idTrabajador = idTrabajador;
-        this.random = new Random();
+        this.productosTotales = productosTotales;
+        this.max_productos = (int) (this.productosTotales * 0.1);
     }
 
     @Override
     public void run() {
-        while (true) {
-            if (productosProcesados >= maxProductos) {
-                synchronized (Main.buzonReproceso) {
-                    Main.buzonReproceso.agregarElemento("FIN");
-                    Main.buzonReproceso.notifyAll();
-                }
-                procesarProductosRestantes();
-                return;
-            }
-
-            synchronized (Main.buzonRevision) {
-                while (Main.buzonRevision.lleno()) {
+        while (!debeParar()) {
+            synchronized (buzonRevision) {
+                while (buzonRevision.vacio()) {
                     try {
-                        Main.buzonRevision.wait();
+                        //Trabajador de calidad espera hasta que haya productos para revisar
+                        buzonRevision.wait();
+                        System.out.println("Trabajador de calidad con id "+this.id+" espera hasta que haya productos para revisar");
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         return;
                     }
                 }
-                String producto = null;
+                
                 try {
-                    producto = Main.buzonRevision.retirarElemento();
+                    String producto = buzonRevision.getElemento();
+                    procesarProducto(producto);
+                    System.out.println("Trabajador de calidad con id "+this.id+" revisa el producto "+producto);
+                    buzonRevision.retirarElemento();
+
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return;
                 }
-                if (producto != null) {
-                    procesarProducto(producto);
-                }
+
             }
             Thread.yield(); // Espera semiactiva
+        }
+        synchronized (buzonReproceso) {
+            buzonReproceso.agregarElemento("FIN");
+            buzonReproceso.notifyAll();
         }
     }
 
     private void procesarProducto(String producto) {
-        productosProcesados++;
-        if (productosRechazados >= productosProcesados * 0.10) {
-            aceptarProducto(producto);
-        } else {
-            if (aceptarORechazar()) {
-                productosRechazados++;
-                rechazarProducto(producto);
-            } else {
-                aceptarProducto(producto);
-            }
+        synchronized (TrabajadorCalidad.class) {
+            productosTotalesProcesados++;
         }
+
+        productosProcesados++;
+        boolean rechazar = debeRechazarProducto();
+
+        if (rechazar) {
+            productosRechazados++;
+            rechazarProducto(producto);
+        } else {
+            aceptarProducto(producto);
+        }
+
     }
 
-    private boolean aceptarORechazar() {
-        return random.nextInt(100) + 1 % 7 == 0;
+    private static final Random random = new Random();
+    private boolean debeRechazarProducto() {
+        int numeroAleatorio = random.nextInt(100) + 1;
+        return numeroAleatorio % 7 == 0;
+    }
+
+    private boolean debeParar() {
+        synchronized (TrabajadorCalidad.class) {
+            return productosTotalesProcesados >= productosTotales;
+        }
     }
 
     private void rechazarProducto(String producto) {
-        synchronized (Main.buzonReproceso) {
-            Main.buzonReproceso.agregarElemento(producto);
-            Main.buzonReproceso.notifyAll();
+        synchronized (buzonReproceso) {
+            buzonReproceso.agregarElemento(producto);
+            buzonReproceso.notifyAll();
         }
-        System.out.println("Trabajador " + idTrabajador + " rechazó el producto: " + producto);
     }
 
     private void aceptarProducto(String producto) {
-        synchronized (Main.buzonDeposito) {
-            Main.buzonDeposito.agregarElemento(producto);
-            Main.buzonDeposito.notifyAll();
-        }
-        System.out.println("Trabajador " + idTrabajador + " aceptó el producto: " + producto);
-    }
-
-    private void procesarProductosRestantes() {
-        while (true) {
-            synchronized (Main.buzonRevision) {
-                if (!Main.buzonRevision.lleno()) {
-                    break;
-                }
-                String producto = null;
-                try {
-                    producto = Main.buzonRevision.retirarElemento();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-                if (producto != null) {
-                    procesarProducto(producto);
-                }
-            }
+        synchronized (buzonDeposito) {
+            buzonDeposito.agregarElemento(producto);
+            buzonDeposito.notifyAll();
         }
     }
 }
