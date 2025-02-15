@@ -22,7 +22,7 @@ public class Main {
 
         for (int i = 0; i < cantidadTrabajador; i++) {
             new Thread(new TrabajadorProductor(i)).start();
-            new Thread(new TrabajadorCalidad(productosTotales, i)).start();
+            new Thread(new TrabajadorCalidad(buzonRevision, buzonReproceso, buzonDeposito, i, productosTotales)).start();
         }
     }
 }
