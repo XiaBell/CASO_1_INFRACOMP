@@ -25,8 +25,18 @@ public class BuzonRevision {
         return "Elemento revisado"; 
     }
 
+
+    public synchronized String getElemento() {
+        return ElementosRevision.get(0);
+    }
+
     public synchronized boolean lleno() {
         notifyAll();
         return ElementosRevision.size() >= capacidad;
+    }
+
+
+    public synchronized boolean vacio() {
+        return ElementosRevision.size() <= 0;
     }
 }

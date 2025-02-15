@@ -79,7 +79,7 @@ public class TrabajadorCalidad extends Thread {
 
     private void aceptarProducto(String producto) {
         synchronized (Main.buzonDeposito) {
-            Main.buzonDeposito.AgregarElemento(producto);
+            Main.buzonDeposito.agregarElemento(producto);
             Main.buzonDeposito.notifyAll();
         }
         System.out.println("Trabajador " + idTrabajador + " aceptó el producto: " + producto);
