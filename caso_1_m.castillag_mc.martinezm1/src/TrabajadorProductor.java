@@ -6,28 +6,31 @@ public class TrabajadorProductor extends Thread {
     private static BuzonRevision buzonRevision;
     private static BuzonReproceso buzonReproceso;
     public static  AtomicInteger productosProducidos = new AtomicInteger(0);
-    public TrabajadorProductor(int id) {
+
+    public TrabajadorProductor(BuzonRevision buzonRevision, BuzonReproceso buzonReproceso, int id) {
         this.id = id;
         TrabajadorProductor.buzonRevision = buzonRevision;
         TrabajadorProductor.buzonReproceso = buzonReproceso;
+
     }
 
     @Override
     public void run() {
-        while (seguirTrabajando()) {
-            trabajar();
-        
+        while (!buzonReproceso.hayFin()) {
+            if (seguirTrabajando()){
+                trabajar();
+            }      
         }
     }
 
     public void trabajar() {
-        if (buzonReproceso.vacio()) {
-           generarProducto();
-        } else {
-            reprocesarProducto();
+        if (!buzonReproceso.vacio()) {
+           reprocesarProducto();
+        } else if (!buzonRevision.lleno()) {
+            generarProducto();
         }
-
     }
+
     // Método para generar un producto
     public void generarProducto() {
         System.out.println("Producto con id "+ (productosProducidos.get() + 1) + " generado");
@@ -41,13 +44,12 @@ public class TrabajadorProductor extends Thread {
     }
     // Método para reprocesar un producto
     public void reprocesarProducto() {
-        synchronized(buzonReproceso){
-            try {
-                buzonReproceso.retirarElemento(id);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+        try {
+            buzonReproceso.retirarElemento(id);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
+        
     }
     //Sigue produciendo si el buzón de revisión no está lleno y no hay fin
     public boolean seguirTrabajando() {

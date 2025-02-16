@@ -8,6 +8,7 @@ public class BuzonRevision {
         this.capacidad = capacidad;
     }
 
+    //Método para agregar un producto al buzón de revisión. Responsabilidad de los trabajadores productores
     public synchronized void agregarElemento(String elemento) throws InterruptedException {
         while (ElementosRevision.size() >= capacidad) {
             wait(); // Espera hasta que haya espacio en el buzón

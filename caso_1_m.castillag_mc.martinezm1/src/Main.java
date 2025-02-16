@@ -21,8 +21,9 @@ public class Main {
         buzonDeposito = new BuzonDeposito();
 
         for (int i = 0; i < cantidadTrabajador; i++) {
-            new Thread(new TrabajadorProductor(i+1)).start();
+            new Thread(new TrabajadorProductor(buzonRevision, buzonReproceso, i+1)).start();
             System.out.println("Trabajador productor con id " + (i+1) + " creado");
+
             new Thread(new TrabajadorCalidad(buzonRevision, buzonReproceso, buzonDeposito, i+1, productosTotales)).start();
             System.out.println("Trabajador de calidad con id " + (i+1) + " creado");
         }

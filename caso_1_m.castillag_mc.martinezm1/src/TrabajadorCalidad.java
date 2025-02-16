@@ -8,7 +8,7 @@ public class TrabajadorCalidad extends Thread {
     private int id;
     private int productosProcesados;
     private int productosRechazados;
-    private int max_productos;
+    private int maximosRechazados;
     private static int productosTotalesProcesados = 0;
     private static int productosTotales;
 
@@ -16,46 +16,75 @@ public class TrabajadorCalidad extends Thread {
         TrabajadorCalidad.buzonRevision = buzonRevision;
         TrabajadorCalidad.buzonReproceso = buzonReproceso;
         TrabajadorCalidad.buzonDeposito = buzonDeposito;
+        TrabajadorCalidad.productosTotales = productosTotales;
         this.id = id;
         this.productosProcesados = 0;
         this.productosRechazados = 0;
-        this.max_productos = (int) (productosTotales * 0.1);
+        this.maximosRechazados = (int) (productosTotales * 0.1);
 
     }
 
     public void run() {
+        while (!debeParar()) {
+            String producto = null;
 
-        synchronized (buzonReproceso) {
-            productosTotalesProcesados++;  
-        
-            if (productosTotalesProcesados == productosTotales) {  
-                System.out.println("Se han revisado todos los productos necesarios.");
-                buzonReproceso.agregarElemento("FIN");
-                buzonReproceso.notifyAll();
+            while((producto = buzonRevision.getElemento()) == null){
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
+
+            //
+            clasificarProducto(producto);
+
+            // Incrementar productos procesados de forma segura
+            synchronized (TrabajadorCalidad.class) {
+                productosTotalesProcesados++;
+            }
+
+            Thread.yield();
+            
+        }
+
     }
 
+    //Método para avisar al buzón de reproceso que se debe parar la ejecución
     private boolean debeParar() {
         synchronized (TrabajadorCalidad.class) {
             boolean shouldStop = productosTotalesProcesados == productosTotales;
             if (shouldStop) {
                 System.out.println("Debe parar la ejecución");
-                synchronized (buzonRevision) {
-                    buzonRevision.notifyAll(); // Notificar hilos en espera
+                buzonReproceso.agregarElemento(id, "FIN");
+                synchronized (buzonReproceso) {
+                    buzonReproceso.notifyAll(); // Notificar hilos en espera
                 }
             }
             
             return shouldStop;
         }
     }
-
-    private void rechazarProducto(String producto) {
-        synchronized (buzonReproceso) {
-            buzonReproceso.agregarElemento(producto);
-            buzonReproceso.notifyAll();
+    //Método para trabajar en la clasificación de productos
+    private void clasificarProducto(String producto) {
+        Random random = new Random();
+        int probabilidad = random.nextInt(100)+1;
+        if (maximosRechazados > productosRechazados && probabilidad % 7 == 0) {
+            rechazarProducto(producto);
+            productosRechazados++;
+        } else {
+            aceptarProducto(producto);
         }
     }
 
+    // Método para rechazar un producto y enviarlo al buzón de reproceso
+    private void rechazarProducto(String producto) {
+        synchronized (buzonReproceso) {
+            buzonReproceso.agregarElemento(id, producto);
+            buzonReproceso.notifyAll();
+        }
+    }
+    // Método para aceptar un producto y enviarlo al buzón de depósito
     private void aceptarProducto(String producto) {
         synchronized (buzonDeposito) {
             buzonDeposito.agregarElemento(producto);

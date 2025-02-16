@@ -4,17 +4,14 @@ public class BuzonReproceso {
 
     private ArrayList<String> elementosReproceso = new ArrayList<>();
 
-    public synchronized void agregarElemento(String elemento) {
+    //Método para agregar un producto al buzón de reproceso. Responsabilidad de los trabajadores de calidad
+    public synchronized void agregarElemento(int idTrabajador, String elemento) {
+        System.out.println("El trabajador de calidad con id " + idTrabajador + " agrega el producto " + elemento);
         elementosReproceso.add(elemento);
         notifyAll(); // Notifica a los productores que hay productos para reprocesar
     }
 
-    public synchronized ArrayList<String> getListaElementos() {
-        ArrayList<String> copiaElementos = new ArrayList<>(elementosReproceso);
-        notifyAll();
-        return copiaElementos;
-    }
-
+    //Método para retirar un producto del buzón de reproceso. Responsabilidad de los trabajadores productores
     public synchronized String retirarElemento(int idProductor) throws InterruptedException {
         while (elementosReproceso.isEmpty()) {
             wait(); // Espera hasta que haya productos para reprocesar
