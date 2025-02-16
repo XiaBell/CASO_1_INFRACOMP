@@ -19,8 +19,17 @@ public class TrabajadorCalidad extends Thread {
         this.id = id;
         this.productosProcesados = 0;
         this.productosRechazados = 0;
-        this.productosTotales = productosTotales;
-        this.max_productos = (int) (this.productosTotales * 0.1);
+
+        synchronized (TrabajadorCalidad.class) {
+            if (TrabajadorCalidad.productosTotales == 0) {
+                TrabajadorCalidad.productosTotales = productosTotales;
+            } else if (TrabajadorCalidad.productosTotales != productosTotales) {
+                throw new IllegalArgumentException("productosTotales no coincide");
+            }
+        }
+
+        this.max_productos = (int) (productosTotales * 0.1);
+
     }
 
     @Override
@@ -53,8 +62,10 @@ public class TrabajadorCalidad extends Thread {
             Thread.yield(); // Espera semiactiva
         }
         synchronized (buzonReproceso) {
-            buzonReproceso.agregarElemento("FIN");
-            buzonReproceso.notifyAll();
+            if (!buzonReproceso.hayFin()) {
+                buzonReproceso.agregarElemento("FIN");
+                buzonReproceso.notifyAll();
+            }
         }
     }
 

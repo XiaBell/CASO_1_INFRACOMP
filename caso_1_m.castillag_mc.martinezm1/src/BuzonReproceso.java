@@ -36,6 +36,7 @@ public class BuzonReproceso {
     public synchronized boolean hayFin() {
         try {
             if (elementosReproceso.get(0).equals("FIN")) {
+                notifyAll(); // Notifica a los trabajadores de calidad que hay un fin
                 return true;
             }
         } catch (Exception e) {
