@@ -19,77 +19,20 @@ public class TrabajadorCalidad extends Thread {
         this.id = id;
         this.productosProcesados = 0;
         this.productosRechazados = 0;
-
-        synchronized (TrabajadorCalidad.class) {
-            if (TrabajadorCalidad.productosTotales == 0) {
-                TrabajadorCalidad.productosTotales = productosTotales;
-            } else if (TrabajadorCalidad.productosTotales != productosTotales) {
-                throw new IllegalArgumentException("productosTotales no coincide");
-            }
-        }
-
         this.max_productos = (int) (productosTotales * 0.1);
 
     }
 
-    @Override
     public void run() {
-        while (!debeParar()) {
-            synchronized (buzonRevision) {
-                while (buzonRevision.vacio() && !debeParar()) {
-                    try {
-                        //Trabajador de calidad espera hasta que haya productos para revisar
-                        buzonRevision.wait();
-                        System.out.println("Trabajador de calidad con id "+this.id+" espera hasta que haya productos para revisar");
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        return;
-                    }
-                }
-                
-                try {
-                    String producto = buzonRevision.getElemento();
-                    procesarProducto(producto);
-                    System.out.println("Trabajador de calidad con id "+this.id+" revisa el producto "+producto);
-                    buzonRevision.retirarElemento();
 
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-
-            }
-            Thread.yield(); // Espera semiactiva
-        }
         synchronized (buzonReproceso) {
-            if (!buzonReproceso.hayFin()) {
+            productosTotalesProcesados++;  
+        
+            if (productosTotalesProcesados == productosTotales) {  
+                System.out.println("Se han revisado todos los productos necesarios.");
                 buzonReproceso.agregarElemento("FIN");
                 buzonReproceso.notifyAll();
             }
-        }
-    }
-
-    private void procesarProducto(String producto) {
-        synchronized (TrabajadorCalidad.class) {
-            productosTotalesProcesados++;
-        }
-
-        productosProcesados++;
-        boolean rechazar = debeRechazarProducto();
-
-        if (rechazar) {
-            productosRechazados++;
-            rechazarProducto(producto);
-        } else {
-            aceptarProducto(producto);
-        }
-
-    }
-
-    private static final Random random = new Random();
-    private boolean debeRechazarProducto() {
-        int numeroAleatorio = random.nextInt(100) + 1;
-        return numeroAleatorio % 7 == 0;
     }
 
     private boolean debeParar() {

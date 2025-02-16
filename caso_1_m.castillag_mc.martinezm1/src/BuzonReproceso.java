@@ -15,11 +15,14 @@ public class BuzonReproceso {
         return copiaElementos;
     }
 
-    public synchronized String retirarElemento() throws InterruptedException {
+    public synchronized String retirarElemento(int idProductor) throws InterruptedException {
         while (elementosReproceso.isEmpty()) {
             wait(); // Espera hasta que haya productos para reprocesar
         }
-        return elementosReproceso.remove(0);    
+        System.out.println("El productor con id " + idProductor + " ha reprocesado el producto " + elementosReproceso.get(0));
+        String producto = elementosReproceso.remove(0);
+        notifyAll(); // Notifica a los trabajadores productores que hay espacio en el buzón
+        return producto;    
     }
 
     public synchronized boolean vacio() {
@@ -35,8 +38,8 @@ public class BuzonReproceso {
 
     public synchronized boolean hayFin() {
         try {
-            if (elementosReproceso.get(0).equals("FIN")) {
-                notifyAll(); // Notifica a los trabajadores de calidad que hay un fin
+            if (elementosReproceso.contains("FIN")) {
+                notifyAll(); // Notifica a los trabajadores productores que dejen de producir
                 return true;
             }
         } catch (Exception e) {

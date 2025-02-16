@@ -13,7 +13,7 @@ public class BuzonRevision {
             wait(); // Espera hasta que haya espacio en el buzón
         }
         ElementosRevision.add(elemento);
-        notifyAll(); // Notifica a los consumidores que hay productos para revisar
+        notifyAll(); // Notifica a los trabajadores de calidad que hay productos para revisar
     }
 
     public synchronized String retirarElemento() throws InterruptedException {
