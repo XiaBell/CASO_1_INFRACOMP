@@ -27,7 +27,7 @@ public class TrabajadorCalidad extends Thread {
     public void run() {
         while (!debeParar()) {
             synchronized (buzonRevision) {
-                while (buzonRevision.vacio()) {
+                while (buzonRevision.vacio() && !debeParar()) {
                     try {
                         //Trabajador de calidad espera hasta que haya productos para revisar
                         buzonRevision.wait();
@@ -83,7 +83,15 @@ public class TrabajadorCalidad extends Thread {
 
     private boolean debeParar() {
         synchronized (TrabajadorCalidad.class) {
-            return productosTotalesProcesados >= productosTotales;
+            boolean shouldStop = productosTotalesProcesados == productosTotales;
+            if (shouldStop) {
+                System.out.println("Debe parar la ejecución");
+                synchronized (buzonRevision) {
+                    buzonRevision.notifyAll(); // Notificar hilos en espera
+                }
+            }
+            
+            return shouldStop;
         }
     }
 

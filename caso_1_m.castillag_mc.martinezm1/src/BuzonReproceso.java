@@ -9,6 +9,12 @@ public class BuzonReproceso {
         notifyAll(); // Notifica a los productores que hay productos para reprocesar
     }
 
+    public synchronized ArrayList<String> getListaElementos() {
+        ArrayList<String> copiaElementos = new ArrayList<>(elementosReproceso);
+        notifyAll();
+        return copiaElementos;
+    }
+
     public synchronized String retirarElemento() throws InterruptedException {
         while (elementosReproceso.isEmpty()) {
             wait(); // Espera hasta que haya productos para reprocesar
@@ -25,5 +31,16 @@ public class BuzonReproceso {
             wait(); // Espera hasta que haya productos para reprocesar
         }
         return elementosReproceso.get(0);
+    }
+
+    public synchronized boolean hayFin() {
+        try {
+            if (elementosReproceso.get(0).equals("FIN")) {
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
     }
 }
