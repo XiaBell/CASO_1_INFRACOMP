@@ -52,7 +52,7 @@ public class TrabajadorCalidad extends Thread {
     //Método para avisar al buzón de reproceso que se debe parar la ejecución
     private boolean debeParar() {
         synchronized (TrabajadorCalidad.class) {
-            boolean shouldStop = productosTotalesProcesados == productosTotales;
+            boolean shouldStop = productosTotalesProcesados >= productosTotales;
             if (shouldStop) {
                 System.out.println("Debe parar la ejecución");
                 buzonReproceso.agregarElemento(id, "FIN");
@@ -78,10 +78,7 @@ public class TrabajadorCalidad extends Thread {
 
     // Método para rechazar un producto y enviarlo al buzón de reproceso
     private void rechazarProducto(String producto) {
-        synchronized (buzonReproceso) {
-            buzonReproceso.agregarElemento(id, producto);
-            buzonReproceso.notifyAll();
-        }
+        buzonReproceso.agregarElemento(id, producto);
     }
     // Método para aceptar un producto y enviarlo al buzón de depósito
     private void aceptarProducto(String producto) {

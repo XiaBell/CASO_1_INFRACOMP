@@ -22,9 +22,9 @@ public class BuzonRevision {
         while (vacio()) {
             wait(); // Espera hasta que haya productos para revisar
         }
-        ElementosRevision.remove(0);
+        String producto = ElementosRevision.remove(0);
         notifyAll(); // Notifica a los productores que hay espacio en el buzón
-        return "Elemento revisado"; 
+        return producto; 
     }
 
 

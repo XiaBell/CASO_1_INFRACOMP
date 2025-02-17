@@ -19,9 +19,18 @@ public class TrabajadorProductor extends Thread {
     @Override
     public void run() {
         while (!buzonReproceso.hayFin()) {
-            if (seguirTrabajando()){
-                trabajar();
-            }      
+            synchronized (buzonReproceso) {
+                if (seguirTrabajando()) {
+                    trabajar();
+                } else {
+                    try {
+                        buzonReproceso.wait(); // Espera hasta recibir notificación
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -36,19 +45,20 @@ public class TrabajadorProductor extends Thread {
     // Método para generar un producto
     public void generarProducto() {
 
-        System.out.println("Producto con id "+ (productosProducidos.get() + 1) + " generado");
+        int nextId = productosProducidos.incrementAndGet();
+        System.out.println("Producto con id "+ nextId + " generado");
 
         try {
-            buzonRevision.agregarElemento(String.valueOf(productosProducidos.get() + 1));
+            buzonRevision.agregarElemento(String.valueOf(nextId));
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
-        productosProducidos.incrementAndGet();
     }
     // Método para reprocesar un producto
     public void reprocesarProducto() {
         try {
-            buzonReproceso.retirarElemento(id);
+            String producto = buzonReproceso.retirarElemento(id);
+            buzonRevision.agregarElemento(producto);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
