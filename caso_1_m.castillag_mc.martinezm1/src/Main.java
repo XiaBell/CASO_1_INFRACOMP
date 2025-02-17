@@ -2,7 +2,6 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class Main {
-    public static final Logger logger = Logger.getLogger(Main.class.getName());
     public static BuzonRevision buzonRevision;
     public static BuzonReproceso buzonReproceso;
     public static BuzonDeposito buzonDeposito;

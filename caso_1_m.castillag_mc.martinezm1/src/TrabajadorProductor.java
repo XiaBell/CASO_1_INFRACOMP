@@ -66,6 +66,6 @@ public class TrabajadorProductor extends Thread {
     }
     //Sigue produciendo si el buzón de revisión no está lleno y no hay fin
     public boolean seguirTrabajando() {
-        return !buzonReproceso.hayFin() && !buzonRevision.lleno();
+        return !buzonReproceso.hayFin();
     }
 }
