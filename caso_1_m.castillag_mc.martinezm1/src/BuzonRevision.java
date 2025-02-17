@@ -27,6 +27,9 @@ public class BuzonRevision {
         return "Elemento revisado"; 
     }
 
+    public synchronized int elementosTotales() {
+        return ElementosRevision.size();
+    }
 
     public synchronized String getElemento() {
 

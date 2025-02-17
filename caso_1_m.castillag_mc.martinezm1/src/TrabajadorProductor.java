@@ -7,8 +7,6 @@ public class TrabajadorProductor extends Thread {
     private static BuzonReproceso buzonReproceso;
     public static  AtomicInteger productosProducidos = new AtomicInteger(0);
 
-    
-
     public TrabajadorProductor(BuzonRevision buzonRevision, BuzonReproceso buzonReproceso, int id) {
         this.id = id;
         TrabajadorProductor.buzonRevision = buzonRevision;
@@ -35,11 +33,11 @@ public class TrabajadorProductor extends Thread {
 
     // Método para generar un producto
     public void generarProducto() {
-
-        System.out.println("Producto con id "+ (productosProducidos.get() + 1) + " generado");
-
         try {
-            buzonRevision.agregarElemento(String.valueOf(productosProducidos.get() + 1));
+            synchronized(buzonRevision){
+                System.out.println("Producto con id "+ (productosProducidos.get() + 1) + " generado");
+                buzonRevision.agregarElemento(String.valueOf(productosProducidos.get() + 1));
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
