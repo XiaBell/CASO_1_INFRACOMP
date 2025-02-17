@@ -87,7 +87,7 @@ public class TrabajadorCalidad extends Thread {
     // Método para aceptar un producto y enviarlo al buzón de depósito
     private void aceptarProducto(String producto) {
         synchronized (buzonDeposito) {
-            buzonDeposito.agregarElemento(producto);
+            buzonDeposito.agregarElemento(id, producto);
             buzonDeposito.notifyAll();
         }
     }

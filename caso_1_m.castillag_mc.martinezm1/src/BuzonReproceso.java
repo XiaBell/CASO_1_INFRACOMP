@@ -6,7 +6,10 @@ public class BuzonReproceso {
 
     //Método para agregar un producto al buzón de reproceso. Responsabilidad de los trabajadores de calidad
     public synchronized void agregarElemento(int idTrabajador, String elemento) {
-        System.out.println("El trabajador de calidad con id " + idTrabajador + " agrega el producto " + elemento);
+        if (elemento != "FIN") {
+            System.out.println("El trabajador de calidad con id " + idTrabajador + " agrega el producto " + elemento + " al buzón de reproceso");
+            
+        }
         elementosReproceso.add(elemento);
         notifyAll(); // Notifica a los productores que hay productos para reprocesar
     }
