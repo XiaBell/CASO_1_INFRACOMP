@@ -15,10 +15,11 @@ public class BuzonRevision {
         }
         ElementosRevision.add(elemento);
         notifyAll(); // Notifica a los trabajadores de calidad que hay productos para revisar
+        System.out.println("Hay un total de " + ElementosRevision.size() + " elementos en el buzón de revisión");
     }
 
     public synchronized String retirarElemento() throws InterruptedException {
-        while (ElementosRevision.isEmpty()) {
+        while (vacio()) {
             wait(); // Espera hasta que haya productos para revisar
         }
         ElementosRevision.remove(0);
@@ -28,7 +29,14 @@ public class BuzonRevision {
 
 
     public synchronized String getElemento() {
-        return ElementosRevision.get(0);
+
+        try{
+        String elemento = ElementosRevision.get(0);
+        ElementosRevision.remove(0);
+        return elemento;
+        }catch(Exception e){
+            return null;
+        }
     }
 
     public synchronized boolean lleno() {
@@ -39,4 +47,5 @@ public class BuzonRevision {
     public synchronized boolean vacio() {
         return ElementosRevision.size() <= 0;
     }
+    
 }

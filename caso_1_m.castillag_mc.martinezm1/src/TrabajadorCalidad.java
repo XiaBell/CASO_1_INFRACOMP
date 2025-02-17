@@ -27,7 +27,6 @@ public class TrabajadorCalidad extends Thread {
     public void run() {
         while (!debeParar()) {
             String producto = null;
-
             while((producto = buzonRevision.getElemento()) == null){
                 try {
                     Thread.sleep(10);
