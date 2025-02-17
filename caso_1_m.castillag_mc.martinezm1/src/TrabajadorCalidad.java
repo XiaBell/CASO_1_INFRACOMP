@@ -52,7 +52,7 @@ public class TrabajadorCalidad extends Thread {
     //Método para avisar al buzón de reproceso que se debe parar la ejecución
     private boolean debeParar() {
         synchronized (TrabajadorCalidad.class) {
-            boolean shouldStop = productosTotalesProcesados >= productosTotales;
+            boolean shouldStop = buzonDeposito.total() >= productosTotales;
             if (shouldStop) {
                 System.out.println("Debe parar la ejecución");
                 buzonReproceso.agregarElemento(id, "FIN");
