@@ -21,19 +21,12 @@ public class BuzonReproceso {
         }
         System.out.println("El productor con id " + idProductor + " ha reprocesado el producto " + elementosReproceso.get(0));
         String producto = elementosReproceso.remove(0);
-        notifyAll(); // Notifica a los trabajadores productores que hay espacio en el buzón
+        notifyAll(); // Notifica a los trabajadores de calidad que hay espacio en el buzón
         return producto;    
     }
 
     public synchronized boolean vacio() {
         return elementosReproceso.isEmpty();
-    }
-
-    public synchronized String obtenerElemento() throws InterruptedException {
-        while (elementosReproceso.isEmpty()) {
-            wait(); // Espera hasta que haya productos para reprocesar
-        }
-        return elementosReproceso.get(0);
     }
 
     public synchronized boolean hayFin() {

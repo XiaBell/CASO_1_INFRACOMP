@@ -11,10 +11,6 @@ public class BuzonDeposito {
         System.out.println("Hay un total de " + ElementosDeposito.size() + " elementos en el depósito");
     }
 
-     public synchronized ArrayList<String> getElementos() {
-        return ElementosDeposito;
-    }
-
     public synchronized int total() {
         return ElementosDeposito.size();
     }

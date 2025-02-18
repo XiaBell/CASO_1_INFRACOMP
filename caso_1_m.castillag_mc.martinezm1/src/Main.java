@@ -24,7 +24,7 @@ public class Main {
             System.out.println("Trabajador productor con id " + (i+1) + " creado");
 
             new Thread(new TrabajadorCalidad(buzonRevision, buzonReproceso, buzonDeposito, i+1, productosTotales)).start();
-            System.out.println("Los productos totales son: " + productosTotales);
+            //System.out.println("Los productos totales son: " + productosTotales);
             System.out.println("Trabajador de calidad con id " + (i+1) + " creado");
         }
     }

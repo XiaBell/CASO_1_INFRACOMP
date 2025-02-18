@@ -6,7 +6,6 @@ public class TrabajadorCalidad extends Thread {
     private static BuzonReproceso buzonReproceso;
     private static BuzonDeposito buzonDeposito;
     private int id;
-    private int productosProcesados;
     private int productosRechazados;
     private int maximosRechazados;
     private static int productosTotalesProcesados = 0;
@@ -18,7 +17,6 @@ public class TrabajadorCalidad extends Thread {
         TrabajadorCalidad.buzonDeposito = buzonDeposito;
         TrabajadorCalidad.productosTotales = productosTotales;
         this.id = id;
-        this.productosProcesados = 0;
         this.productosRechazados = 0;
         this.maximosRechazados = (int) (productosTotales * 0.1);
 
@@ -54,8 +52,8 @@ public class TrabajadorCalidad extends Thread {
         synchronized (TrabajadorCalidad.class) {
             boolean shouldStop = productosTotalesProcesados >= productosTotales;
             if (shouldStop) {
-                System.out.println("Debe parar la ejecución");
                 buzonReproceso.agregarElemento(id, "FIN");
+                System.out.println("Fin de la ejecución del trabajador de calidad con id " + id);
                 synchronized (buzonReproceso) {
                     buzonReproceso.notifyAll(); // Notificar hilos en espera
                 }
@@ -82,9 +80,6 @@ public class TrabajadorCalidad extends Thread {
     }
     // Método para aceptar un producto y enviarlo al buzón de depósito
     private void aceptarProducto(String producto) {
-        synchronized (buzonDeposito) {
-            buzonDeposito.agregarElemento(id, producto);
-            buzonDeposito.notifyAll();
-        }
+        buzonDeposito.agregarElemento(id, producto);
     }
 }
